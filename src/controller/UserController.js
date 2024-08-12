@@ -43,12 +43,12 @@ const UserController = {
         return res.status(500).json({
           msg: "Usuario não encontrado",
         });
+      } else {
+        res.status(200).json({
+          msg: "Usuario Encontrado",
+          Usuario: usuario,
+        });
       }
-
-      res.status(200).json({
-        msg: "Usuario Encontrado",
-        Usuario: usuario,
-      });
     } catch (error) {
       return res.status(500).json({
         msg: "Acione o Suporte",
@@ -59,19 +59,25 @@ const UserController = {
     try {
       const { id } = req.params;
       const { nome, email, senha } = req.body;
-      const user = await User.update(
-        {
-          nome,
-          email,
-          senha,
-        },
-        {
-          where: { id: id },
-        }
-      );
-      res.status(200).json({
-        msg: "User Atualizado com Sucesso !",
-      });
+      if (!(await User.findByPk(id))) {
+        res.status(500).json({
+          msg: "Usuario não encontrado",
+        });
+      } else {
+        const user = await User.update(
+          {
+            nome,
+            email,
+            senha,
+          },
+          {
+            where: { id: id },
+          }
+        );
+        res.status(200).json({
+          msg: "User Atualizado com Sucesso !",
+        });
+      }
     } catch (error) {
       console.error(error);
       return res.status(500).json({
@@ -87,12 +93,12 @@ const UserController = {
         return res.status(500).json({
           msg: "O Usuario não foi encontrado",
         });
+      } else {
+        user.destroy();
+        res.status(200).json({
+          msg: "User Deletado com Sucesso !",
+        });
       }
-
-      user.destroy();
-      res.status(200).json({
-        msg: "User Deletado com Sucesso !",
-      });
     } catch (error) {
       console.error(error);
       res.status(500).json({
